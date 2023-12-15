@@ -143,23 +143,10 @@ def add_review(request, dealer_id):
             "review": params['review'],
             "purchase": params['purchase'] == 'on',
             "purchase_date": params['purchase_date'],
-            "car_make": "Audi",
-            "car_model": "Car",
-            "car_year": 2021
+            "car_make": params['car'],
+            "car_model": params['car'],
+            "car_year": params['car']
         }
-
-        # {
-        #     "id": 1114,
-        #     "name": "Upkar Lidder",
-        #     "dealership": 15,
-        #     "review": "Great service! Test",
-        #     "purchase": false,
-        #     "another": "field",
-        #     "purchase_date": "02/16/2021",
-        #     "car_make": "Audi",
-        #     "car_model": "Car",
-        #     "car_year": 2021
-        # }
 
         print(json_payload)
 

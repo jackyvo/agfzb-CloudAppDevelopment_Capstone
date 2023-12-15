@@ -12,15 +12,41 @@
     <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
 
 </head>
-
+    
     <body>
-    <!-- Remove this line the first time you edit this file -->
-     This is the index page of your Django app!
     <!--Add a nav bar here -->
-    <nav>
-        <ul>
-            <li><a href="/djangoapp/about">About</a></li>
-            <li><a href="/djangoapp/contact">Contact Us</a></li>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <!-- Site Name on the Left -->
+        <a class="navbar-brand" href="/">Dealership Review</a>
+    
+        <!-- Navigation Items -->
+        <ul class="navbar-nav ml-auto d-flex flex-row ">
+            {% if user.is_authenticated %}
+                <!-- Display user's first name or username -->
+                <li class="nav-item">
+                    <span class="nav-link">Welcome, {{ user.first_name|default:user.username }}</span>
+                </li>
+
+                <!-- Signout Link/Button -->
+                <li class="nav-item">
+                    <a class="nav-link ml-2" href="{% url 'djangoapp:logout' %}">Logout</a>
+                </li>
+            {% else %}
+                <!-- Form for Username and Password -->
+                <li class="nav-item">
+                    <form class="form-inline my-2 my-lg-0 " action="{% url 'djangoapp:login' %}" method="post">
+                        {% csrf_token %}
+                        <input class="form-control mr-sm-2 col" type="text" placeholder="Username" aria-label="Username" name="username">
+                        <input class="form-control mr-sm-2 col" type="password" placeholder="Password" aria-label="Password" name="password">
+                        <button class="btn btn-primary my-2 my-sm-0" type="submit">Login</button>
+                    </form>
+                </li>
+                
+                <!-- Link/Button to Signup View -->
+                <li class="nav-item">
+                    <a class="nav-link my-2 ml-2" href="{% url 'djangoapp:registration' %}">Signup</a>
+                </li>
+            {% endif %}
         </ul>
     </nav>
     <!--Add a dealer table here -->

@@ -10,9 +10,69 @@
     <body>
 
     <!--Add a nav bar here -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <!-- Site Name on the Left -->
+        <a class="navbar-brand" href="/">Dealership Review</a>
+    
+        <!-- Navigation Items -->
+        <ul class="navbar-nav ml-auto d-flex flex-row ">
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link ml-2" href="{% url 'djangoapp:add_review' dealer_id %}">Add Review</a>
+                </li>
+                <!-- Display user's first name or username -->
+                <li class="nav-item">
+                    <span class="nav-link">Welcome, {{ user.first_name|default:user.username }}</span>
+                </li>
+                
+                <!-- Signout Link/Button -->
+                <li class="nav-item">
+                    <a class="nav-link ml-2" href="{% url 'djangoapp:logout' %}">Logout</a>
+                </li>
+            {% else %}
+                <!-- Form for Username and Password -->
+                <li class="nav-item">
+                    <form class="form-inline my-2 my-lg-0 " action="{% url 'djangoapp:login' %}" method="post">
+                        {% csrf_token %}
+                        <input class="form-control mr-sm-2 col" type="text" placeholder="Username" aria-label="Username" name="username">
+                        <input class="form-control mr-sm-2 col" type="password" placeholder="Password" aria-label="Password" name="password">
+                        <button class="btn btn-primary my-2 my-sm-0" type="submit">Login</button>
+                    </form>
+                </li>
+                
+                <!-- Link/Button to Signup View -->
+                <li class="nav-item">
+                    <a class="nav-link my-2 ml-2" href="{% url 'djangoapp:registration' %}">Signup</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 
     <!-- Add reviews as cards -->
-
+    <div class='row'>
+        <div class='col-md-2'></div>
+        <div class='col-md-6'>
+            <div class="card-columns">
+                {% for review in reviews %}
+                    <div class="card">
+                        {% if review.sentiment == 'positive' %}
+                            <img class="card-img-left" src="{{ MEDIA_URL }}/emoji/positive.png" alt="Positive Sentiment">
+                        {% elif review.sentiment == 'neutral' %}
+                            <img class="card-img-left" src="{{ MEDIA_URL }}/emoji/neutral.png" alt="Neutral Sentiment">
+                        {% else %}
+                            <img class="card-img-left" src="{{ MEDIA_URL }}/emoji/negative.png" alt="Negative Sentiment">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                {{ review.car_model }} {{ review.car_make }} ({{ review.car_year }})
+                            </h5>
+                            <p class="card-text">{{ review.review }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
     </body>
 
 </html>

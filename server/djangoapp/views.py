@@ -99,10 +99,12 @@ def get_dealerships(request):
         url = "https://jackyinvn-4000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/dealerships/get"
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
-        # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
-        # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        # # Concat all dealer's short name
+        # dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # # Return a list of dealer short name
+        # return HttpResponse(dealer_names)
+        context = { 'dealership_list': dealerships }
+        return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
@@ -111,36 +113,53 @@ def get_dealer_details(request, dealer_id):
         url = "https://jackyinvn-5000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/get_reviews"
         # Get dealers from the URL
         reviews = get_dealer_by_id_from_cf(url, dealer_id)
-        print(reviews)
-        # Concat all dealer's short name
-        reviews_list = ' '.join([review.review for review in reviews])
-        # Return a list of dealer short name
-        return HttpResponse(reviews_list)
+        # print(reviews)
+        # # Concat all dealer's short name
+        # reviews_list = ' '.join([review.review for review in reviews])
+        # # Return a list of dealer short name
+        # return HttpResponse(reviews_list)
+        context = {  
+            'reviews': reviews, 
+            'dealer_id': dealer_id 
+        }
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
-@csrf_exempt
-def add_review(request):
+def add_review(request, dealer_id):
     if request.method == 'POST':
         # Create JSON payload
-        print(request.body)
+        print(request.POST)
 
-        params = json.loads(request.body)
+        params = request.POST
 
         json_payload = {
             "id": 1114,
             "time": datetime.utcnow().isoformat(),
-            "name": params['name'],
+            "name": "User",
             "dealership": params['dealership'],
             "review": params['review'],
-            "purchase": params['purchase'],
+            "purchase": params['purchase'] == 'on',
             "purchase_date": params['purchase_date'],
-            "car_make": params['car_make'],
-            "car_model": params['car_model'],
-            "car_year": params['car_year']
+            "car_make": "Audi",
+            "car_model": "Car",
+            "car_year": 2021
         }
+
+        # {
+        #     "id": 1114,
+        #     "name": "Upkar Lidder",
+        #     "dealership": 15,
+        #     "review": "Great service! Test",
+        #     "purchase": false,
+        #     "another": "field",
+        #     "purchase_date": "02/16/2021",
+        #     "car_make": "Audi",
+        #     "car_model": "Car",
+        #     "car_year": 2021
+        # }
 
         print(json_payload)
 
@@ -154,7 +173,20 @@ def add_review(request):
             # Optionally, print the response in the console
             print(response.text)
             # Or append it to an HttpResponse and render it in the browser
-            return HttpResponse(response.text)
+            return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
         else:
             return HttpResponse("Failed to add review")
 
+    else:
+        cars = [
+            {"id": 1, "name": "Car A", "make": "Make A", "year": 2022},
+            {"id": 2, "name": "Car B", "make": "Make B", "year": 2020},
+            {"id": 3, "name": "Car C", "make": "Make C", "year": 2021},
+            # Add more cars as needed...
+        ]
+
+        context = { 
+            'cars': cars,
+            'dealer_id': dealer_id 
+        }
+        return render(request, 'djangoapp/add_review.html', context)

@@ -3,12 +3,14 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
-from .restapis import get_dealers_from_cf, get_dealer_by_id_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_by_id_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
 import logging
 import json
+from django.views.decorators.csrf import csrf_exempt
+import uuid
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -119,4 +121,40 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
+@csrf_exempt
+def add_review(request):
+    if request.method == 'POST':
+        # Create JSON payload
+        print(request.body)
+
+        params = json.loads(request.body)
+
+        json_payload = {
+            "id": 1114,
+            "time": datetime.utcnow().isoformat(),
+            "name": params['name'],
+            "dealership": params['dealership'],
+            "review": params['review'],
+            "purchase": params['purchase'],
+            "purchase_date": params['purchase_date'],
+            "car_make": params['car_make'],
+            "car_model": params['car_model'],
+            "car_year": params['car_year']
+        }
+
+        print(json_payload)
+
+        # Call post_request method with the payload
+        url = 'https://jackyinvn-5000.theiadockernext-1-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/api/post_review'  # Replace with your API endpoint
+        response = post_request(url, json_payload)
+
+        print(response)
+        print(response.text)
+        if response:
+            # Optionally, print the response in the console
+            print(response.text)
+            # Or append it to an HttpResponse and render it in the browser
+            return HttpResponse(response.text)
+        else:
+            return HttpResponse("Failed to add review")
 
